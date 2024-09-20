@@ -1,0 +1,37 @@
+# Session lokal
+ci_sessions/
+
+#files bulanan
+/src/files/file_bulanan/aset_investasi/*
+/src/files/file_bulanan/ikhtisar_kinerja/*
+/src/files/file_bulanan/iuran_beban/*
+/src/files/file_bulanan/keterangan/*
+/src/files/file_bulanan/kewajiban/*
+/src/files/file_bulanan/pendahuluan/*
+
+!/src/files/file_bulanan/aset_investasi/.gitkeep
+!/src/files/file_bulanan/ikhtisar_kinerja/.gitkeep
+!/src/files/file_bulanan/iuran_beban/.gitkeep
+!/src/files/file_bulanan/keterangan/.gitkeep
+!/src/files/file_bulanan/kewajiban/.gitkeep
+!/src/files/file_bulanan/pendahuluan/.gitkeep
+
+#files semesteran
+/src/files/file_semesteran/aspek_investasi/*
+/src/files/file_semesteran/aspek_operasional/*
+/src/files/file_semesteran/keterangan/*
+/src/files/file_semesteran/operasional_belanja/*
+/src/files/file_semesteran/pendahuluan/*
+
+!/src/files/file_semesteran/aspek_investasi/.gitkeep
+!/src/files/file_semesteran/aspek_operasional/.gitkeep
+!/src/files/file_semesteran/keterangan/.gitkeep
+!/src/files/file_semesteran/operasional_belanja/.gitkeep
+!/src/files/file_semesteran/pendahuluan/.gitkeep
+
+#files tahunan
+/src/files/file_tahunan/keterangan/*
+/src/files/file_tahunan/pendahuluan/*
+
+!/src/files/file_tahunan/keterangan/.gitkeep
+!/src/files/file_tahunan/pendahuluan/.gitkeep

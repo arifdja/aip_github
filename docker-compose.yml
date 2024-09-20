@@ -1,0 +1,54 @@
+services:
+  app:
+    build: ./app  
+    image: monevaip_app
+    container_name: monevaip_app
+    restart: always
+    ports:
+      # <Port exposed> : <MySQL Port running inside container>
+      - '801:80'
+      - '4431:443'
+    expose:
+      # Opens port 3306 on the container
+      - '801'
+      - '4431'
+      # Where our data will be persisted
+    volumes:
+      - /home/arif/docker/aip/src:/var/www/html
+    networks:
+      - monevaip_network
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0.2
+    container_name: monevaip_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db_ag_smartaip'
+      # So you don't have to use root, but you can if you like
+      # MYSQL_USER: 'usr_ag_smartaip'
+      # You can use whatever password you like
+      # MYSQL_PASSWORD: 'gajahterbang'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      # <Port exposed> : <MySQL Port running inside container>
+      - '33061:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '33061'
+      # Where our data will be persisted
+    volumes:
+      - monevaip_data:/var/lib/mysql
+      - ./db/sql:/docker-entrypoint-initdb.d
+      - ./db/conf:/etc/mysql/conf.d
+    networks:
+      - monevaip_network
+
+volumes:
+  monevaip_data:
+    driver: local
+
+networks:
+  monevaip_network:
+
