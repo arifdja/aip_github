@@ -14,7 +14,7 @@ services:
       - '4431'
       # Where our data will be persisted
     volumes:
-      - /home/arif/docker/aip/src:/var/www/html
+      - ./src:/var/www/html
     networks:
       - monevaip_network
     depends_on:
