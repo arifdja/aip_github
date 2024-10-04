@@ -226,6 +226,47 @@ class Perubahan_dana_bersih_model extends CI_Model {
 				// echo $sql;exit;
 			break;
 
+			// case 'aset_investasi_front_sum':
+			// 	// kondisi setelah bulan januari
+			// 	// kondisi bulan lalu
+			// 	if($id_bulan == 1){
+			// 		$bln_lalu = 12;
+			// 		$tahun_lalu = $tahun - 1;
+			// 	}else{
+			// 		$bln_lalu = $id_bulan -1;
+			// 		$tahun_lalu = $tahun;
+			// 	}
+
+
+			// 	$sql="
+			// 		SELECT A.id_investasi, A.jenis_investasi, A.iduser,B.id,
+			// 		COALESCE(SUM(B.rka), 0) as rka,
+			// 		COALESCE(SUM(B.saldo_akhir), 0) as saldo_akhir,
+			// 		COALESCE(SUM(B.saldo_awal), 0) as saldo_awal,
+			// 		COALESCE(SUM(C.saldo_akhir_lalu), 0) as saldo_akhir_lalu
+			// 		FROM mst_investasi A
+			// 		LEFT JOIN(
+			// 			SELECT id,id_investasi, rka, saldo_akhir_invest as saldo_akhir, saldo_awal_invest as saldo_awal, id_bulan, iduser, tahun
+			// 			FROM bln_aset_investasi_header
+			// 			WHERE id_bulan = '".$id_bulan."'
+			// 			AND iduser = '".$iduser."'
+			// 			AND tahun = '".$tahun."'
+			// 		) B ON A.id_investasi = B.id_investasi
+			// 		LEFT JOIN(
+			// 			SELECT id,id_investasi, rka, saldo_akhir_invest as saldo_akhir_lalu, id_bulan, iduser, tahun
+			// 			FROM bln_aset_investasi_header
+			// 			WHERE id_bulan = '".$bln_lalu."'
+			// 			AND iduser = '".$iduser."'
+			// 			AND tahun = '".$tahun_lalu."'
+			// 		) C ON A.id_investasi = C.id_investasi
+		
+			// 		WHERE A.`group` ='".$p1."'
+			// 		AND A.iduser = '".$iduser."'
+			// 		ORDER BY A.no_urut ASC
+			// 	";
+
+			// break;
+
 			case 'aset_investasi_front_sum':
 				// kondisi setelah bulan januari
 				// kondisi bulan lalu
@@ -238,34 +279,71 @@ class Perubahan_dana_bersih_model extends CI_Model {
 				}
 
 
-				$sql="
-					SELECT A.id_investasi, A.jenis_investasi, A.iduser,B.id,
-					COALESCE(SUM(B.rka), 0) as rka,
-					COALESCE(SUM(B.saldo_akhir), 0) as saldo_akhir,
-					COALESCE(SUM(B.saldo_awal), 0) as saldo_awal,
+				$sql = "	
+					SELECT
+						A.iduser,
+						B.id_bulan,
+						sum(B.saldo_awal) AS saldo_awal,
+					CASE WHEN A.`group` = 'BEBAN INVESTASI'  AND  A.type_sub_jenis_investasi = 'C'
+						THEN max(B.rka)
+						ELSE sum(B.rka)
+					END AS rka,
+					sum(B.saldo_akhir) AS saldo_akhir,
 					COALESCE(SUM(C.saldo_akhir_lalu), 0) as saldo_akhir_lalu
 					FROM mst_investasi A
-					LEFT JOIN(
-						SELECT id,id_investasi, rka, saldo_akhir_invest as saldo_akhir, saldo_awal_invest as saldo_awal, id_bulan, iduser, tahun
-						FROM bln_aset_investasi_header
-						WHERE id_bulan = '".$id_bulan."'
-						AND iduser = '".$iduser."'
-						AND tahun = '".$tahun."'
+					LEFT JOIN (
+						SELECT
+							x.id_investasi,
+							y.jenis_investasi, 
+							sum(x.saldo_awal_invest) AS saldo_awal,
+							sum(x.mutasi_invest) AS mutasi,
+							CASE WHEN y.`group` = 'BEBAN INVESTASI'  AND  y.type_sub_jenis_investasi = 'C'
+								THEN max(x.rka)
+								ELSE sum(x.rka)
+							END AS rka,
+							(sum(x.saldo_akhir_invest)/max(x.rka)*100) AS realisasi_rka,
+							x.tahun,
+							sum(x.saldo_akhir_invest) AS saldo_akhir,
+							x.id_bulan,
+							x.iduser
+						FROM bln_aset_investasi_header x
+						LEFT JOIN mst_investasi y ON x.id_investasi = y.id_investasi
+						WHERE x.id_bulan = '".$id_bulan."'
+						AND x.iduser = '".$iduser."'
+						AND x.tahun = '".$tahun."'
+						AND y.`group` = 'BEBAN INVESTASI' 
+						GROUP BY y.type_sub_jenis_investasi, y.parent_id
 					) B ON A.id_investasi = B.id_investasi
-					LEFT JOIN(
-						SELECT id,id_investasi, rka, saldo_akhir_invest as saldo_akhir_lalu, id_bulan, iduser, tahun
-						FROM bln_aset_investasi_header
-						WHERE id_bulan = '".$bln_lalu."'
-						AND iduser = '".$iduser."'
-						AND tahun = '".$tahun_lalu."'
+
+					LEFT JOIN (
+						SELECT
+							x.id_investasi,
+							y.jenis_investasi, 
+							sum(x.saldo_awal_invest) AS saldo_awal,
+							sum(x.mutasi_invest) AS mutasi,
+							CASE WHEN y.`group` = 'BEBAN INVESTASI'  AND  y.type_sub_jenis_investasi = 'C'
+								THEN max(x.rka)
+								ELSE sum(x.rka)
+							END AS rka,
+							(sum(x.saldo_akhir_invest)/max(x.rka)*100) AS realisasi_rka,
+							x.tahun,
+							sum(x.saldo_akhir_invest) AS saldo_akhir_lalu,
+							x.id_bulan,
+							x.iduser
+						FROM bln_aset_investasi_header x
+						LEFT JOIN mst_investasi y ON x.id_investasi = y.id_investasi
+						WHERE x.id_bulan = '".$bln_lalu."'
+						AND x.iduser = '".$iduser."'
+						AND x.tahun = '".$tahun_lalu."'
+						AND y.`group` = 'BEBAN INVESTASI'
+						GROUP BY y.type_sub_jenis_investasi, y.parent_id
 					) C ON A.id_investasi = C.id_investasi
-		
 					WHERE A.`group` ='".$p1."'
 					AND A.iduser = '".$iduser."'
 					ORDER BY A.no_urut ASC
-				";
 
-			break;
+
+				";
 
 
 

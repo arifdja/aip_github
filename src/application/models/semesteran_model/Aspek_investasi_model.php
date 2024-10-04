@@ -478,7 +478,7 @@ class Aspek_investasi_model extends CI_Model {
 					$tahun_filter = $tahun;
 				}
 
-				if ($p1 == 'INVESTASI') {
+				if ($p2 == 'INVESTASI') {
 					$where_sm1 .= "
 						AND id_bulan = '6'
 					";
@@ -486,7 +486,7 @@ class Aspek_investasi_model extends CI_Model {
 					$where_sm2 .= "
 						AND id_bulan = '12'
 					";
-				}else if ($p1 == 'HASIL INVESTASI') {
+				}else if ($p2 == 'HASIL INVESTASI') {
 					$where_sm1 .= "
 						AND id_bulan BETWEEN 1 AND 6
 					";
@@ -506,9 +506,12 @@ class Aspek_investasi_model extends CI_Model {
 
 				$sql="
 					SELECT A.id_investasi, A.jenis_investasi, A.jns_form, A.iduser,A.type_sub_jenis_investasi as type,B.id,
-					B.rka as rka, 
-					COALESCE(SUM(CASE WHEN A.group = 'HASIL INVESTASI' THEN B.mutasi else B.saldo_akhir end), 0) as saldo_akhir_smt1,
-					COALESCE(SUM(CASE WHEN A.group = 'HASIL INVESTASI' THEN C.mutasi else C.saldo_akhir end), 0) as saldo_akhir_smt2,
+					CASE WHEN (A.`group` ='INVESTASI' AND A.type_sub_jenis_investasi = 'C') OR (A.`group` ='BEBAN INVESTASI' AND A.type_sub_jenis_investasi = 'C')
+					  THEN 0 
+					  ELSE B.rka 
+					END AS rka, 
+					COALESCE(SUM(CASE WHEN A.`group` = 'HASIL INVESTASI' THEN B.mutasi else B.saldo_akhir end), 0) as saldo_akhir_smt1,
+					COALESCE(SUM(CASE WHEN A.`group` = 'HASIL INVESTASI' THEN C.mutasi else C.saldo_akhir end), 0) as saldo_akhir_smt2,
 					D.mutasi_penambahan as mutasi_penambahan,
 					D.mutasi_pengurangan as mutasi_pengurangan
 					FROM mst_investasi A
@@ -552,6 +555,93 @@ class Aspek_investasi_model extends CI_Model {
 				";
 				// echo $sql;exit;
 			break;
+
+			// case 'aset_investasi_front_lv3':
+			// 	$semester = $this->input->post('semester');
+			// 	if($semester != ""){
+			// 		if ($semester == 1) {
+			// 			$tahun_filter = $tahun - 1;
+			// 		}else{
+			// 			$tahun_filter = $tahun;
+			// 		}
+			// 	}else{
+			// 		$tahun_filter = $tahun;
+			// 	}
+
+			// 	if ($p1 == 'INVESTASI') {
+			// 		$where_sm1 .= "
+			// 			AND id_bulan = '6'
+			// 		";
+
+			// 		$where_sm2 .= "
+			// 			AND id_bulan = '12'
+			// 		";
+			// 	}else if ($p1 == 'HASIL INVESTASI') {
+			// 		$where_sm1 .= "
+			// 			AND id_bulan BETWEEN 1 AND 6
+			// 		";
+
+			// 		$where_sm2 .= "
+			// 			AND id_bulan BETWEEN 7 AND 12
+			// 		";
+			// 	}else{
+			// 		$where_sm1 .= "
+			// 			AND id_bulan BETWEEN 1 AND 6
+			// 		";
+
+			// 		$where_sm2 .= "
+			// 			AND id_bulan BETWEEN 7 AND 12
+			// 		";
+			// 	}
+
+			// 	$sql="
+			// 		SELECT A.id_investasi, A.jenis_investasi, A.jns_form, A.iduser,A.type_sub_jenis_investasi as type,B.id,
+			// 		B.rka as rka, 
+			// 		COALESCE(SUM(CASE WHEN A.group = 'HASIL INVESTASI' THEN B.mutasi else B.saldo_akhir end), 0) as saldo_akhir_smt1,
+			// 		COALESCE(SUM(CASE WHEN A.group = 'HASIL INVESTASI' THEN C.mutasi else C.saldo_akhir end), 0) as saldo_akhir_smt2,
+			// 		D.mutasi_penambahan as mutasi_penambahan,
+			// 		D.mutasi_pengurangan as mutasi_pengurangan
+			// 		FROM mst_investasi A
+			// 		LEFT JOIN(
+			// 			SELECT id,id_investasi, sum(saldo_awal_invest) as saldo_awal, sum(mutasi_invest) as mutasi, rka, realisasi_rka,
+			// 			sum(saldo_akhir_invest) as saldo_akhir, id_bulan, iduser, tahun
+			// 			FROM bln_aset_investasi_header
+			// 			$where_sm1
+			// 			AND iduser = '".$iduser."'
+			// 			AND tahun = '".$tahun."'
+			// 			GROUP BY id_investasi
+			// 		) B ON A.id_investasi = B.id_investasi
+			// 		LEFT JOIN(
+			// 			SELECT id,id_investasi, sum(saldo_awal_invest) as saldo_awal, sum(mutasi_invest) as mutasi, rka, realisasi_rka,
+			// 			sum(saldo_akhir_invest) as saldo_akhir, id_bulan, iduser, tahun
+			// 			FROM bln_aset_investasi_header
+			// 			$where_sm2
+			// 			AND iduser = '".$iduser."'
+			// 			AND tahun = '".$tahun_filter."'
+			// 			GROUP BY id_investasi
+			// 		) C ON A.id_investasi = C.id_investasi
+			// 		LEFT JOIN (
+			// 			SELECT bln_aset_investasi_header_id, COALESCE(mutasi_pembelian, 0) as mutasi_pembelian,
+			// 				COALESCE(sum(mutasi_penjualan), 0) as mutasi_penjualan, 
+			// 				COALESCE(sum(mutasi_penanaman), 0) as mutasi_penanaman, 
+			// 				COALESCE(sum(mutasi_pencairan), 0) as mutasi_pencairan, 
+			// 				(COALESCE(sum(mutasi_pembelian), 0)+COALESCE(sum(mutasi_penanaman), 0)) as mutasi_penambahan,
+			// 				(COALESCE(sum(mutasi_penjualan), 0)+COALESCE(sum(mutasi_pencairan), 0)) as mutasi_pengurangan,
+			// 				id_bulan, iduser, tahun
+			// 			FROM bln_aset_investasi_detail
+			// 			WHERE id_bulan BETWEEN 7 AND 12
+			// 			AND iduser = '".$iduser."'
+			// 			AND tahun = '".$tahun."'
+			// 		) D ON B.id = D.bln_aset_investasi_header_id
+			// 		WHERE A.`group` ='".$p2."'
+			// 		AND A.iduser = '".$iduser."'
+			// 		AND A.parent_id ='".$p1."'
+			// 		GROUP BY A.id_investasi
+			// 		ORDER BY A.no_urut ASC
+
+			// 	";
+			// 	// echo $sql;exit;
+			// break;
 
 			case 'aset_investasi_front_sum':
 				$semester = $this->input->post('semester');

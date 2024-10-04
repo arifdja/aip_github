@@ -57,32 +57,33 @@
 
         </tr>
       <?php endif;?>
-      <?php if($invest['type'] == 'PC'):?>
-        <tr>
-          <td style="text-align:left;"><?=$invest['jenis_investasi']?></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      <?php endif;?>
       <?php foreach($invest['child'] as $child):?>
-        <tr>
-          <td style="text-align:left; padding-left: 30px; color: #6c7275;"><?='- '.$child['jenis_investasi']?></td>
-          <td style="text-align: right;"><?=($child['saldo_akhir_smt1'] != 0 ) ? rupiah($child['saldo_akhir_smt1']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['mutasi_penambahan'] != 0 ) ? rupiah($child['mutasi_penambahan']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['mutasi_pengurangan'] != 0 ) ? rupiah($child['mutasi_pengurangan']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['saldo_akhir_smt2'] != 0 ) ? rupiah($child['saldo_akhir_smt2']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['rka'] != 0 ) ? rupiah($child['rka']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['pers_rka'] != 0 ) ? persen($child['pers_rka']).'%' : '-';?></td>
-          <td style="text-align: right;"><?=($child['nominal'] != 0 ) ? rupiah($child['nominal']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['persentase'] != 0 ) ? persen($child['persentase']).'%' : '-';?></td>
-        </tr>
-
+        <?php if($invest['type'] == 'PC'):?>
+          <tr>
+            <td style="text-align:left;"><?= $child['jenis_investasi']?></td>
+            <td style="text-align: right;"><?=($child['saldo_akhir_smt1'] != 0 ) ? rupiah($child['saldo_akhir_smt1']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['mutasi_penambahan'] != 0 ) ? rupiah($child['mutasi_penambahan']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['mutasi_pengurangan'] != 0 ) ? rupiah($child['mutasi_pengurangan']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['saldo_akhir_smt2'] != 0 ) ? rupiah($child['saldo_akhir_smt2']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['rka'] != 0 ) ? rupiah($child['rka']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['pers_rka'] != 0 ) ? persen($child['pers_rka']).'%' : '-';?></td>
+            <td style="text-align: right;"><?=($child['nominal'] != 0 ) ? rupiah($child['nominal']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['persentase'] != 0 ) ? persen($child['persentase']).'%' : '-';?></td>
+          </tr>
+        <?php endif;?>
+        <?php foreach($child['subchild'] as $subchild):?>
+          <tr>
+            <td style="text-align:left; padding-left: 30px; color: #6c7275;"><?='- '.$subchild['jenis_investasi']?></td>
+            <td style="text-align: right;"><?=($subchild['saldo_akhir_smt1'] != 0 ) ? rupiah($subchild['saldo_akhir_smt1']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['mutasi_penambahan'] != 0 ) ? rupiah($subchild['mutasi_penambahan']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['mutasi_pengurangan'] != 0 ) ? rupiah($subchild['mutasi_pengurangan']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['saldo_akhir_smt2'] != 0 ) ? rupiah($subchild['saldo_akhir_smt2']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['rka'] != 0 ) ? rupiah($subchild['rka']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['pers_rka'] != 0 ) ? persen($subchild['pers_rka']).'%' : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['nominal'] != 0 ) ? rupiah($subchild['nominal']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['persentase'] != 0 ) ? persen($subchild['persentase']).'%' : '-';?></td>
+          </tr>
+        <?php endforeach;?>
       <?php endforeach;?>
     <?php endforeach;?>
   <?php endif;?>
@@ -130,10 +131,10 @@
       <?php if($invest['type'] == 'P'):?>
         <tr>
           <td style="text-align: left;"><?=$invest['jenis_investasi']?></td>
-          <td style="text-align: right;"><?=($invest['saldo_akhir_smt2'] != 0 ) ? rupiah($invest['saldo_akhir_smt2']) : '-';?></td>
+          <td style="text-align: right;"><?=($invest['saldo_akhir_smt1'] != 0 ) ? rupiah($invest['saldo_akhir_smt1']) : '-';?></td>
           <td style="text-align: right;"><?=($invest['mutasi_penambahan'] != 0 ) ? rupiah($invest['mutasi_penambahan']) : '-';?></td>
           <td style="text-align: right;"><?=($invest['mutasi_pengurangan'] != 0 ) ? rupiah($invest['mutasi_pengurangan']) : '-';?></td>
-          <td style="text-align: right;"><?=($invest['saldo_akhir_smt1'] != 0 ) ? rupiah($invest['saldo_akhir_smt1']) : '-';?></td>
+          <td style="text-align: right;"><?=($invest['saldo_akhir_smt2'] != 0 ) ? rupiah($invest['saldo_akhir_smt2']) : '-';?></td>
           <td style="text-align: right;"><?=($invest['rka'] != 0 ) ? rupiah($invest['rka']) : '-';?></td>
           <td style="text-align: right;"><?=($invest['pers_rka'] != 0 ) ? persen($invest['pers_rka']).'%' : '-';?></td>
           <td style="text-align: right;"><?=($invest['nominal'] != 0 ) ? rupiah($invest['nominal']) : '-';?></td>
@@ -141,32 +142,33 @@
 
         </tr>
       <?php endif;?>
-      <?php if($invest['type'] == 'PC'):?>
-        <tr>
-          <td style="text-align:left;"><?=$invest['jenis_investasi']?></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      <?php endif;?>
       <?php foreach($invest['child'] as $child):?>
-        <tr>
-          <td style="text-align:left; padding-left: 30px; color: #6c7275;"><?='- '.$child['jenis_investasi']?></td>
-          <td style="text-align: right;"><?=($child['saldo_akhir_smt2'] != 0 ) ? rupiah($child['saldo_akhir_smt2']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['mutasi_penambahan'] != 0 ) ? rupiah($child['mutasi_penambahan']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['mutasi_pengurangan'] != 0 ) ? rupiah($child['mutasi_pengurangan']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['saldo_akhir_smt1'] != 0 ) ? rupiah($child['saldo_akhir_smt1']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['rka'] != 0 ) ? rupiah($child['rka']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['pers_rka'] != 0 ) ? persen($child['pers_rka']).'%' : '-';?></td>
-          <td style="text-align: right;"><?=($child['nominal'] != 0 ) ? rupiah($child['nominal']) : '-';?></td>
-          <td style="text-align: right;"><?=($child['persentase'] != 0 ) ? persen($child['persentase']).'%' : '-';?></td>
-        </tr>
-
+        <?php if($invest['type'] == 'PC'):?>
+          <tr>
+            <td style="text-align:left;"><?= $child['jenis_investasi']?></td>
+            <td style="text-align: right;"><?=($child['saldo_akhir_smt1'] != 0 ) ? rupiah($child['saldo_akhir_smt1']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['mutasi_penambahan'] != 0 ) ? rupiah($child['mutasi_penambahan']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['mutasi_pengurangan'] != 0 ) ? rupiah($child['mutasi_pengurangan']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['saldo_akhir_smt2'] != 0 ) ? rupiah($child['saldo_akhir_smt2']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['rka'] != 0 ) ? rupiah($child['rka']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['pers_rka'] != 0 ) ? persen($child['pers_rka']).'%' : '-';?></td>
+            <td style="text-align: right;"><?=($child['nominal'] != 0 ) ? rupiah($child['nominal']) : '-';?></td>
+            <td style="text-align: right;"><?=($child['persentase'] != 0 ) ? persen($child['persentase']).'%' : '-';?></td>
+          </tr>
+        <?php endif;?>
+        <?php foreach($child['subchild'] as $subchild):?>
+          <tr>
+            <td style="text-align:left; padding-left: 30px; color: #6c7275;"><?='- '.$subchild['jenis_investasi']?></td>
+            <td style="text-align: right;"><?=($subchild['saldo_akhir_smt1'] != 0 ) ? rupiah($subchild['saldo_akhir_smt1']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['mutasi_penambahan'] != 0 ) ? rupiah($subchild['mutasi_penambahan']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['mutasi_pengurangan'] != 0 ) ? rupiah($subchild['mutasi_pengurangan']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['saldo_akhir_smt2'] != 0 ) ? rupiah($subchild['saldo_akhir_smt2']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['rka'] != 0 ) ? rupiah($subchild['rka']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['pers_rka'] != 0 ) ? persen($subchild['pers_rka']).'%' : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['nominal'] != 0 ) ? rupiah($subchild['nominal']) : '-';?></td>
+            <td style="text-align: right;"><?=($subchild['persentase'] != 0 ) ? persen($subchild['persentase']).'%' : '-';?></td>
+          </tr>
+        <?php endforeach;?>
       <?php endforeach;?>
     <?php endforeach;?>
   <?php endif;?>
