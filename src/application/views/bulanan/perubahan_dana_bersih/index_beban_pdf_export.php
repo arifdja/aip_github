@@ -106,7 +106,8 @@
 	<td>Total</td>
 	<td style="text-align: right;"><?=($sum['saldo_akhir'] != 0 ) ? rupiah($sum['saldo_akhir']) : '-';?></td>
 	<td style="text-align: right;"><?=($sum['saldo_akhir_lalu'] != 0 ) ? rupiah($sum['saldo_akhir_lalu']) : '-';?></td>
-	<td style="text-align: right;"><?=($sum['rka'] != 0 ) ? rupiah($sum['rka']) : '-';?></td>
+	<!-- <td style="text-align: right;"><?=($sum['rka'] != 0 ) ? rupiah($sum['rka']) : '-';?></td> -->
+	<td></td>
 	<td></td>
 	<td></td>
 	<td></td>

@@ -227,32 +227,127 @@ class Aspek_investasi_th_model extends CI_Model {
 				";
 				// echo $sql;exit;
 			break;
+			// case 'aset_investasi_front_lv2':
+			// 	$sql="
+			// 		SELECT A.parent_id as id_investasi, A.jns_form, A.iduser, B.id_bulan,
+			// 		sum(B.saldo_awal) as saldo_awal, sum(B.mutasi) as mutasi, sum(B.rka) as rka, sum(B.realisasi_rka) as realisasi_rka, 
+			// 		sum(B.saldo_akhir) as saldo_akhir, A.id_investasi as parent_id, C.parent_investasi as jenis_investasi, C.type, B.id
+			// 		FROM mst_investasi A
+			// 		LEFT JOIN(
+			// 			SELECT id,id_investasi, saldo_awal_invest as saldo_awal, mutasi_invest as mutasi, rka, realisasi_rka,
+			// 			saldo_akhir_invest as saldo_akhir, id_bulan, iduser, tahun
+			// 			FROM bln_aset_investasi_header
+			// 			WHERE id_bulan = '".$id_bulan."'
+			// 			AND iduser = '".$iduser."'
+			// 			AND tahun = '".$tahun."'
+			// 		) B ON A.id_investasi = B.id_investasi
+			// 		LEFT JOIN(
+			// 			SELECT id_investasi, jenis_investasi as parent_investasi,
+			// 			type_sub_jenis_investasi as type
+			// 			FROM mst_investasi
+			// 		)C on A.parent_id = C.id_investasi
+			// 		WHERE A.`group` ='".$p2."'
+			// 		AND A.iduser = '".$iduser."'
+			// 		AND (A.type_sub_jenis_investasi = 'C')
+			// 		AND A.parent_id ='".$p1."'
+			// 		ORDER BY A.no_urut ASC
+
+			// 	";
+			// break;
+
 			case 'aset_investasi_front_lv2':
+				
+				$tahun_filter = $tahun - 1;
+
+				if ($p1 == 'INVESTASI') {
+					$where_sm1 .= "
+						AND id_bulan = '13'
+					";
+
+					$where_sm2 .= "
+						AND id_bulan = '13'
+					";
+				} else if ($p1 == 'HASIL INVESTASI') {
+					$where_sm1 .= "
+						AND id_bulan = '13'
+					";
+
+					$where_sm2 .= "
+						AND id_bulan = '13'
+					";
+				} else {
+					$where_sm1 .= "
+						AND id_bulan = '13'
+					";
+
+					$where_sm2 .= "
+						AND id_bulan = '13'
+					";
+				}
+
 				$sql="
-					SELECT A.parent_id as id_investasi, A.jns_form, A.iduser, B.id_bulan,
-					sum(B.saldo_awal) as saldo_awal, sum(B.mutasi) as mutasi, sum(B.rka) as rka, sum(B.realisasi_rka) as realisasi_rka, 
-					sum(B.saldo_akhir) as saldo_akhir, A.id_investasi as parent_id, C.parent_investasi as jenis_investasi, C.type, B.id
+				SELECT y.id_investasi, 
+				y.jenis_investasi, 
+				y.type_sub_jenis_investasi AS type,
+				x.id,x.jns_form,
+				MAX(x.rka) AS rka, 
+				SUM(x.saldo_akhir_thn) AS saldo_akhir_thn, 
+				SUM(x.saldo_akhir_thn_lalu) AS saldo_akhir_thn_lalu,
+				SUM(x.mutasi_penambahan) AS mutasi_penambahan, 
+				SUM(x.mutasi_pengurangan) AS mutasi_pengurangan
+				FROM (
+					SELECT A.id_investasi, A.jenis_investasi, A.jns_form, A.iduser,A.type_sub_jenis_investasi as type, 
+					B.rka, 
+					COALESCE(CASE WHEN A.`group` = 'HASIL INVESTASI' THEN B.mutasi else B.saldo_akhir_thn end, 0) as saldo_akhir_thn,
+					COALESCE(CASE WHEN A.`group` = 'HASIL INVESTASI' THEN C.mutasi else C.saldo_akhir_thn_lalu end, 0) as saldo_akhir_thn_lalu,
+
+					B.id,
+					D.mutasi_penambahan as mutasi_penambahan,
+					D.mutasi_pengurangan as mutasi_pengurangan,
+					A.parent_id
 					FROM mst_investasi A
 					LEFT JOIN(
-						SELECT id,id_investasi, saldo_awal_invest as saldo_awal, mutasi_invest as mutasi, rka, realisasi_rka,
-						saldo_akhir_invest as saldo_akhir, id_bulan, iduser, tahun
+						SELECT id,id_investasi, rka, sum(saldo_akhir_invest) as saldo_akhir_thn, sum(mutasi_invest) as mutasi, id_bulan, iduser, tahun
 						FROM bln_aset_investasi_header
-						WHERE id_bulan = '".$id_bulan."'
+						$where_sm1
 						AND iduser = '".$iduser."'
 						AND tahun = '".$tahun."'
+						GROUP BY id_investasi
 					) B ON A.id_investasi = B.id_investasi
 					LEFT JOIN(
-						SELECT id_investasi, jenis_investasi as parent_investasi,
-						type_sub_jenis_investasi as type
-						FROM mst_investasi
-					)C on A.parent_id = C.id_investasi
-					WHERE A.`group` ='".$p2."'
+						SELECT id,id_investasi, rka, sum(saldo_akhir_invest) as saldo_akhir_thn_lalu, sum(mutasi_invest) as mutasi, id_bulan, iduser, tahun
+						FROM bln_aset_investasi_header
+						$where_sm2
+						AND iduser= '".$iduser."'
+						AND tahun = '".$tahun_filter."'
+						GROUP BY id_investasi
+					) C ON A.id_investasi = C.id_investasi
+					LEFT JOIN (
+						SELECT bln_aset_investasi_header_id, COALESCE(mutasi_pembelian, 0) as mutasi_pembelian,
+							COALESCE(mutasi_penjualan, 0) as mutasi_penjualan, 
+							COALESCE(mutasi_penanaman, 0) as mutasi_penanaman, 
+							COALESCE(mutasi_pencairan, 0) as mutasi_pencairan, 
+							(COALESCE(sum(mutasi_pembelian), 0)+COALESCE(sum(mutasi_penanaman), 0)) as mutasi_penambahan,
+							(COALESCE(sum(mutasi_penjualan), 0)+COALESCE(sum(mutasi_pencairan), 0)) as mutasi_pengurangan,
+							id_bulan, iduser, tahun
+						FROM bln_aset_investasi_detail
+						WHERE id_bulan BETWEEN 1 AND 12
+						AND iduser = '".$iduser."'
+						AND tahun = '".$tahun."'
+					) D ON B.id = D.bln_aset_investasi_header_id
+					WHERE `group`='".$p2."' 
 					AND A.iduser = '".$iduser."'
 					AND (A.type_sub_jenis_investasi = 'C')
-					AND A.parent_id ='".$p1."'
-					ORDER BY A.no_urut ASC
+					GROUP BY A.id_investasi
+				) x
+				JOIN mst_investasi y ON y.id_investasi = x.parent_id
+				WHERE y.id_investasi ='".$p1."'
+				GROUP BY x.parent_id
+
+
 
 				";
+				// echo $sql;exit;
 			break;
 
 			case 'aset_investasi_front_lv3':
@@ -286,7 +381,10 @@ class Aspek_investasi_th_model extends CI_Model {
 
 				$sql="
 					SELECT A.id_investasi, A.jenis_investasi, A.jns_form, A.iduser,A.type_sub_jenis_investasi as type,B.id,
-					B.rka as rka, 
+					CASE WHEN (A.`group` ='INVESTASI' AND A.type_sub_jenis_investasi = 'C') OR (A.`group` ='BEBAN INVESTASI' AND A.type_sub_jenis_investasi = 'C')
+					  THEN 0 
+					  ELSE B.rka 
+					END AS rka,
 					COALESCE(SUM(CASE WHEN A.group = 'HASIL INVESTASI' THEN B.mutasi else B.saldo_akhir end), 0) as saldo_akhir_thn,
 					COALESCE(SUM(CASE WHEN A.group = 'HASIL INVESTASI' THEN C.mutasi else C.saldo_akhir end), 0) as saldo_akhir_thn_lalu,
 					D.mutasi_penambahan as mutasi_penambahan,

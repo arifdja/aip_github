@@ -426,71 +426,7 @@ class Perubahan_dana_bersih extends CI_Controller {
     }
 
 
-    public function nilai_beban_investasi_bkp(){
-        $param_jenis = 'BEBAN INVESTASI';
-        $array = array();
-        $invest = $this->aset_investasi_model->getdataindex('aset_investasi_front','result_array', $param_jenis);
-
-        foreach ($invest as $k => $v) {
-            $array[$k]['id'] = $v['id'];
-            $array[$k]['id_investasi'] = $v['id_investasi'];
-            $array[$k]['jenis_investasi'] = $v['jenis_investasi'];
-            $array[$k]['saldo_akhir'] = (isset($v['saldo_akhir']) ? $v['saldo_akhir'] : 0) ;
-            $array[$k]['saldo_awal'] = (isset($v['saldo_awal']) ? $v['saldo_awal'] : 0) ;
-            $array[$k]['rka'] = $v['rka'];
-            $pers_rka= ($v['rka']!=0)?($v['saldo_akhir']/$v['rka'])*100:0;
-            $array[$k]['pers_rka'] = $pers_rka;
-            $array[$k]['type'] = $v['type'];
-            $array[$k]['nominal'] = $v['saldo_akhir'] - $v['saldo_awal'];
-            $min1 = $v['saldo_akhir'] - $v['saldo_awal'];
-            $array[$k]['persentase'] =($v['saldo_awal']!=0)?($min1/$v['saldo_awal'])*100:0;
-            $array[$k]['jns_form'] = $v['jns_form'];
-            $array[$k]['child'] = array();
-            if($v['type'] == "PC"){
-                $childinvest = $this->aset_investasi_model->getdataindex('aset_investasi_front_lv2','result_array', $v['id_investasi'], $param_jenis);
-                foreach ($childinvest as $key => $val) {
-                    $array[$k]['child'][$key]['id'] = $val['id'];
-                    $array[$k]['child'][$key]['id_investasi'] = $val['id_investasi'];
-                    $array[$k]['child'][$key]['jenis_investasi'] = $val['jenis_investasi'];
-                    $array[$k]['child'][$key]['saldo_awal'] =  (isset($val['saldo_awal']) ? $val['saldo_awal'] : 0) ;
-                    $array[$k]['child'][$key]['saldo_akhir'] = (isset($val['saldo_akhir']) ? $val['saldo_akhir'] : 0) ;
-                    $array[$k]['child'][$key]['rka'] = $val['rka'];
-                    $pers_rka1= ($val['rka']!=0)?($val['saldo_akhir']/$val['rka'])*100:0;
-                    $array[$k]['child'][$key]['pers_rka'] = $pers_rka1;
-                    $array[$k]['child'][$key]['type'] = $val['type'];
-                    $array[$k]['child'][$key]['nominal'] = $val['saldo_akhir'] - $val['saldo_awal'];
-                    $min2 = $val['saldo_akhir'] - $val['saldo_awal'];
-                    $array[$k]['child'][$key]['persentase'] = ($val['saldo_awal']!=0)?($min2/$val['saldo_awal'])*100:0;
-                    $array[$k]['child'][$key]['jns_form'] = $val['jns_form'];
-                    $array[$k]['child'][$key]['subchild'] = array();
-
-                    if($val['type'] == "PC"){
-                        $childinvestlv3 = $this->aset_investasi_model->getdataindex('aset_investasi_front_lv3','result_array', $val['id_investasi'], $param_jenis);
-                        foreach ($childinvestlv3 as $x => $y) {
-                            $array[$k]['child'][$key]['subchild'][$x]['id'] = $y['id'];
-                            $array[$k]['child'][$key]['subchild'][$x]['id_investasi'] = $y['id_investasi'];
-                            $array[$k]['child'][$key]['subchild'][$x]['jenis_investasi'] = $y['jenis_investasi'];
-                            $array[$k]['child'][$key]['subchild'][$x]['saldo_awal'] = (isset($y['saldo_awal']) ? $y['saldo_awal'] : 0);
-                            $array[$k]['child'][$key]['subchild'][$x]['saldo_akhir'] = (isset($y['saldo_akhir']) ? $y['saldo_akhir'] : 0);
-                            $array[$k]['child'][$key]['subchild'][$x]['rka'] = $y['rka'];
-                            $pers_rka2= ($y['rka']!=0)?($y['saldo_akhir']/$y['rka'])*100:0;
-                            $array[$k]['child'][$key]['subchild'][$x]['pers_rka'] = $pers_rka2;
-                            $array[$k]['child'][$key]['subchild'][$x]['type'] = $y['type'];
-                            $array[$k]['child'][$key]['subchild'][$x]['nominal'] = $y['saldo_akhir'] - $y['saldo_awal'];
-                            $min3 = $y['saldo_akhir'] - $y['saldo_awal'];
-                            $array[$k]['child'][$key]['subchild'][$x]['persentase'] =  ($y['saldo_awal']!=0)?($min3/$y['saldo_awal'])*100:0;
-                            $array[$k]['child'][$key]['subchild'][$x]['jns_form'] = $y['jns_form'];
-                        }
-                    }
-                }
-            }
-        }
-
-        // echo '<pre>';
-        // print_r($array);exit;
-        return $array;
-    }
-
+    
 
 	
     public function save_keterangan(){

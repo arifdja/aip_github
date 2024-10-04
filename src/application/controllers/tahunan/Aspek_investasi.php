@@ -325,8 +325,179 @@ class Aspek_investasi extends CI_Controller {
         force_download($name,$data);
     } 
 
-    
+
+    // updated model view controller 
     public function aset_investasi_semester(){
+        $param_jenis = 'INVESTASI';
+        $array = array();
+        $invest = $this->aspek_investasi_th_model->getdataindex('aset_investasi_front','result_array', $param_jenis);
+
+        foreach ($invest as $k => $v) {
+            $array[$k]['id'] = $v['id'];
+            $array[$k]['id_investasi'] = $v['id_investasi'];
+            $array[$k]['jenis_investasi'] = $v['jenis_investasi'];
+            $array[$k]['saldo_akhir_thn'] = (isset($v['saldo_akhir_thn']) ? $v['saldo_akhir_thn'] : 0) ;
+            $array[$k]['saldo_akhir_thn_lalu'] = (isset($v['saldo_akhir_thn_lalu']) ? $v['saldo_akhir_thn_lalu'] : 0) ;
+            $array[$k]['mutasi_penambahan'] = (isset($v['mutasi_penambahan']) ? $v['mutasi_penambahan'] : 0) ;
+            $array[$k]['mutasi_pengurangan'] = (isset($v['mutasi_pengurangan']) ? $v['mutasi_pengurangan'] : 0) ;
+            $array[$k]['rka'] = $v['rka'];
+            $pers_rka= ($v['rka']!=0)?($v['mutasi_penambahan']/$v['rka'])*100:0;
+
+            $pers_rka = (!is_nan($pers_rka) && !is_infinite($pers_rka) ? $pers_rka : '0,00');
+            $array[$k]['pers_rka'] = $pers_rka;
+            $array[$k]['type'] = $v['type'];
+            $array[$k]['nominal'] = $v['saldo_akhir_thn_lalu'] - $v['saldo_akhir_thn'];
+            $pers_nom = ($v['saldo_akhir_thn']!=0)?(($v['saldo_akhir_thn_lalu'] - $v['saldo_akhir_thn'])/$v['saldo_akhir_thn'])*100:0;
+            $pers_nom = (!is_nan($pers_nom) && !is_infinite($pers_nom) ? $pers_nom : '0,00');
+            $array[$k]['persentase'] = $pers_nom;
+            $array[$k]['jns_form'] = $v['jns_form'];
+            $array[$k]['child'] = array();
+            if($v['type'] == "PC"){
+                $child = $this->aspek_investasi_th_model->getdataindex('aset_investasi_front_lv2','result_array', $v['id_investasi'], $param_jenis);
+                foreach ($child as $key => $val) {
+                    $array[$k]['child'][$key]['id'] = $val['id'];
+                    $array[$k]['child'][$key]['id_investasi'] = $val['id_investasi'];
+                    $array[$k]['child'][$key]['jenis_investasi'] = $val['jenis_investasi'];
+                    $array[$k]['child'][$key]['saldo_akhir_thn'] = (isset($val['saldo_akhir_thn']) ? $val['saldo_akhir_thn'] : 0) ;
+                    $array[$k]['child'][$key]['saldo_akhir_thn_lalu'] = (isset($val['saldo_akhir_thn_lalu']) ? $val['saldo_akhir_thn_lalu'] : 0) ;
+                    $array[$k]['child'][$key]['mutasi_penambahan'] = (isset($val['mutasi_penambahan']) ? $val['mutasi_penambahan'] : 0) ;
+                    $array[$k]['child'][$key]['mutasi_pengurangan'] = (isset($val['mutasi_pengurangan']) ? $val['mutasi_pengurangan'] : 0) ;
+                    $array[$k]['child'][$key]['rka'] = $val['rka'];
+
+                    $pers_rka2= ($val['rka']!=0)?($val['mutasi_penambahan']/$val['rka'])*100:0;
+                    $pers_rka2 = (!is_nan($pers_rka2) && !is_infinite($pers_rka2) ? $pers_rka2 : '0,00');
+                    $array[$k]['child'][$key]['pers_rka'] = $pers_rka2;
+                    $array[$k]['child'][$key]['nominal'] = $val['saldo_akhir_thn_lalu'] - $val['saldo_akhir_thn'];
+                    $pers_nom2 = ($val['saldo_akhir_thn']!=0)?(($val['saldo_akhir_thn_lalu'] - $val['saldo_akhir_thn'])/$val['saldo_akhir_thn'])*100:0;
+                    $pers_nom2 = (!is_nan($pers_nom2) && !is_infinite($pers_nom2) ? $pers_nom2 : '0,00');
+                    $array[$k]['child'][$key]['persentase'] = $pers_nom2;
+                    $array[$k]['child'][$key]['type'] = $val['type'];
+                    $array[$k]['child'][$key]['jns_form'] = $val['jns_form'];
+                    $array[$k]['child'][$key]['subchild'] = array();
+
+                    if($val['type'] == "PC"){
+                        $childinvest = $this->aspek_investasi_th_model->getdataindex('aset_investasi_front_lv3','result_array', $val['id_investasi'], $param_jenis);
+                        foreach ($childinvest as $x => $y) {
+                            $array[$k]['child'][$key]['subchild'][$x]['id'] = $y['id'];
+                            $array[$k]['child'][$key]['subchild'][$x]['id_investasi'] = $y['id_investasi'];
+                            $array[$k]['child'][$key]['subchild'][$x]['jenis_investasi'] = $y['jenis_investasi'];
+                            $array[$k]['child'][$key]['subchild'][$x]['saldo_akhir_thn'] = (isset($y['saldo_akhir_thn']) ? $y['saldo_akhir_thn'] : 0) ;
+                            $array[$k]['child'][$key]['subchild'][$x]['saldo_akhir_thn_lalu'] = (isset($y['saldo_akhir_thn_lalu']) ? $y['saldo_akhir_thn_lalu'] : 0) ;
+                            $array[$k]['child'][$key]['subchild'][$x]['mutasi_penambahan'] = (isset($y['mutasi_penambahan']) ? $y['mutasi_penambahan'] : 0) ;
+                            $array[$k]['child'][$key]['subchild'][$x]['mutasi_pengurangan'] = (isset($y['mutasi_pengurangan']) ? $y['mutasi_pengurangan'] : 0) ;
+                            $array[$k]['child'][$key]['subchild'][$x]['rka'] = $y['rka'];
+
+                            $pers_rka2= ($y['rka']!=0)?($y['mutasi_penambahan']/$y['rka'])*100:0;
+                            $pers_rka2 = (!is_nan($pers_rka2) && !is_infinite($pers_rka2) ? $pers_rka2 : '0,00');
+                            $array[$k]['child'][$key]['subchild'][$x]['pers_rka'] = $pers_rka2;
+                            $array[$k]['child'][$key]['subchild'][$x]['nominal'] = $y['saldo_akhir_thn_lalu'] - $y['saldo_akhir_thn'];
+
+                            $pers_nom2 = ($y['saldo_akhir_thn']!=0)?(($y['saldo_akhir_thn_lalu'] - $y['saldo_akhir_thn'])/$y['saldo_akhir_thn'])*100:0;
+                            $pers_nom2 = (!is_nan($pers_nom2) && !is_infinite($pers_nom2) ? $pers_nom2 : '0,00');
+                            $array[$k]['child'][$key]['subchild'][$x]['persentase'] = $pers_nom2;
+                            $array[$k]['child'][$key]['subchild'][$x]['type'] = $y['type'];
+                            $array[$k]['child'][$key]['subchild'][$x]['jns_form'] = $y['jns_form'];
+                        }
+                    }
+                }
+
+                
+            }
+        }
+
+        // echo '<pre>';
+        // print_r($array);exit;
+        return $array;
+    }
+
+
+    // updated model view controller 
+    public function beban_investasi_semester(){
+        $param_jenis = 'BEBAN INVESTASI';
+        $array = array();
+        $invest = $this->aspek_investasi_th_model->getdataindex('aset_investasi_front','result_array', $param_jenis);
+
+        foreach ($invest as $k => $v) {
+            $array[$k]['id'] = $v['id'];
+            $array[$k]['id_investasi'] = $v['id_investasi'];
+            $array[$k]['jenis_investasi'] = $v['jenis_investasi'];
+            $array[$k]['saldo_akhir_thn'] = (isset($v['saldo_akhir_thn']) ? $v['saldo_akhir_thn'] : 0) ;
+            $array[$k]['saldo_akhir_thn_lalu'] = (isset($v['saldo_akhir_thn_lalu']) ? $v['saldo_akhir_thn_lalu'] : 0) ;
+            $array[$k]['mutasi_penambahan'] = (isset($v['mutasi_penambahan']) ? $v['mutasi_penambahan'] : 0) ;
+            $array[$k]['mutasi_pengurangan'] = (isset($v['mutasi_pengurangan']) ? $v['mutasi_pengurangan'] : 0) ;
+            $array[$k]['rka'] = $v['rka'];
+            $pers_rka= ($v['rka']!=0)?($v['mutasi_penambahan']/$v['rka'])*100:0;
+
+            $pers_rka = (!is_nan($pers_rka) && !is_infinite($pers_rka) ? $pers_rka : '0,00');
+            $array[$k]['pers_rka'] = $pers_rka;
+            $array[$k]['type'] = $v['type'];
+            $array[$k]['nominal'] = $v['saldo_akhir_thn_lalu'] - $v['saldo_akhir_thn'];
+            $pers_nom = ($v['saldo_akhir_thn']!=0)?(($v['saldo_akhir_thn_lalu'] - $v['saldo_akhir_thn'])/$v['saldo_akhir_thn'])*100:0;
+            $pers_nom = (!is_nan($pers_nom) && !is_infinite($pers_nom) ? $pers_nom : '0,00');
+            $array[$k]['persentase'] = $pers_nom;
+            $array[$k]['jns_form'] = $v['jns_form'];
+            $array[$k]['child'] = array();
+            if($v['type'] == "PC"){
+                $child = $this->aspek_investasi_th_model->getdataindex('aset_investasi_front_lv2','result_array', $v['id_investasi'], $param_jenis);
+                foreach ($child as $key => $val) {
+                    $array[$k]['child'][$key]['id'] = $val['id'];
+                    $array[$k]['child'][$key]['id_investasi'] = $val['id_investasi'];
+                    $array[$k]['child'][$key]['jenis_investasi'] = $val['jenis_investasi'];
+                    $array[$k]['child'][$key]['saldo_akhir_thn'] = (isset($val['saldo_akhir_thn']) ? $val['saldo_akhir_thn'] : 0) ;
+                    $array[$k]['child'][$key]['saldo_akhir_thn_lalu'] = (isset($val['saldo_akhir_thn_lalu']) ? $val['saldo_akhir_thn_lalu'] : 0) ;
+                    $array[$k]['child'][$key]['mutasi_penambahan'] = (isset($val['mutasi_penambahan']) ? $val['mutasi_penambahan'] : 0) ;
+                    $array[$k]['child'][$key]['mutasi_pengurangan'] = (isset($val['mutasi_pengurangan']) ? $val['mutasi_pengurangan'] : 0) ;
+                    $array[$k]['child'][$key]['rka'] = $val['rka'];
+
+                    $pers_rka2= ($val['rka']!=0)?($val['mutasi_penambahan']/$val['rka'])*100:0;
+                    $pers_rka2 = (!is_nan($pers_rka2) && !is_infinite($pers_rka2) ? $pers_rka2 : '0,00');
+                    $array[$k]['child'][$key]['pers_rka'] = $pers_rka2;
+                    $array[$k]['child'][$key]['nominal'] = $val['saldo_akhir_thn_lalu'] - $val['saldo_akhir_thn'];
+                    $pers_nom2 = ($val['saldo_akhir_thn']!=0)?(($val['saldo_akhir_thn_lalu'] - $val['saldo_akhir_thn'])/$val['saldo_akhir_thn'])*100:0;
+                    $pers_nom2 = (!is_nan($pers_nom2) && !is_infinite($pers_nom2) ? $pers_nom2 : '0,00');
+                    $array[$k]['child'][$key]['persentase'] = $pers_nom2;
+                    $array[$k]['child'][$key]['type'] = $val['type'];
+                    $array[$k]['child'][$key]['jns_form'] = $val['jns_form'];
+                    $array[$k]['child'][$key]['subchild'] = array();
+
+                    if($val['type'] == "PC"){
+                        $childinvest = $this->aspek_investasi_th_model->getdataindex('aset_investasi_front_lv3','result_array', $val['id_investasi'], $param_jenis);
+                        foreach ($childinvest as $x => $y) {
+                            $array[$k]['child'][$key]['subchild'][$x]['id'] = $y['id'];
+                            $array[$k]['child'][$key]['subchild'][$x]['id_investasi'] = $y['id_investasi'];
+                            $array[$k]['child'][$key]['subchild'][$x]['jenis_investasi'] = $y['jenis_investasi'];
+                            $array[$k]['child'][$key]['subchild'][$x]['saldo_akhir_thn'] = (isset($y['saldo_akhir_thn']) ? $y['saldo_akhir_thn'] : 0) ;
+                            $array[$k]['child'][$key]['subchild'][$x]['saldo_akhir_thn_lalu'] = (isset($y['saldo_akhir_thn_lalu']) ? $y['saldo_akhir_thn_lalu'] : 0) ;
+                            $array[$k]['child'][$key]['subchild'][$x]['mutasi_penambahan'] = (isset($y['mutasi_penambahan']) ? $y['mutasi_penambahan'] : 0) ;
+                            $array[$k]['child'][$key]['subchild'][$x]['mutasi_pengurangan'] = (isset($y['mutasi_pengurangan']) ? $y['mutasi_pengurangan'] : 0) ;
+                            $array[$k]['child'][$key]['subchild'][$x]['rka'] = $y['rka'];
+
+                            $pers_rka2= ($y['rka']!=0)?($y['mutasi_penambahan']/$y['rka'])*100:0;
+                            $pers_rka2 = (!is_nan($pers_rka2) && !is_infinite($pers_rka2) ? $pers_rka2 : '0,00');
+                            $array[$k]['child'][$key]['subchild'][$x]['pers_rka'] = $pers_rka2;
+                            $array[$k]['child'][$key]['subchild'][$x]['nominal'] = $y['saldo_akhir_thn_lalu'] - $y['saldo_akhir_thn'];
+
+                            $pers_nom2 = ($y['saldo_akhir_thn']!=0)?(($y['saldo_akhir_thn_lalu'] - $y['saldo_akhir_thn'])/$y['saldo_akhir_thn'])*100:0;
+                            $pers_nom2 = (!is_nan($pers_nom2) && !is_infinite($pers_nom2) ? $pers_nom2 : '0,00');
+                            $array[$k]['child'][$key]['subchild'][$x]['persentase'] = $pers_nom2;
+                            $array[$k]['child'][$key]['subchild'][$x]['type'] = $y['type'];
+                            $array[$k]['child'][$key]['subchild'][$x]['jns_form'] = $y['jns_form'];
+                        }
+                    }
+                }
+
+                
+            }
+        }
+
+        // echo '<pre>';
+        // print_r($array);exit;
+        return $array;
+    }
+
+
+    
+    public function aset_investasi_semester_bkp(){
         $param_jenis = 'INVESTASI';
         $array = array();
         $invest = $this->aspek_investasi_th_model->getdataindex('aset_investasi_front','result_array', $param_jenis);
@@ -436,7 +607,7 @@ class Aspek_investasi extends CI_Controller {
     }
 
 
-    public function beban_investasi_semester(){
+    public function beban_investasi_semester_bkp(){
         $param_jenis = 'BEBAN INVESTASI';
         $array = array();
         $invest = $this->aspek_investasi_th_model->getdataindex('aset_investasi_front','result_array', $param_jenis);

@@ -167,7 +167,8 @@
                                     <td><?=($sum['mutasi_penambahan'] != 0 ) ? rupiah($sum['mutasi_penambahan']) : '-';?></td>
                                     <td><?=($sum['mutasi_pengurangan'] != 0 ) ? rupiah($sum['mutasi_pengurangan']) : '-';?></td>
                                     <td><?=($sum['saldo_akhir_smt2'] != 0 ) ? rupiah($sum['saldo_akhir_smt2']) : '-';?></td>
-                                    <td><?=($sum['rka'] != 0 ) ? rupiah($sum['rka']) : '-';?></td>
+                                    <!-- <td><?=($sum['rka'] != 0 ) ? rupiah($sum['rka']) : '-';?></td> -->
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -250,7 +251,8 @@
                                     <td><?=($sum['mutasi_penambahan'] != 0 ) ? rupiah($sum['mutasi_penambahan']) : '-';?></td>
                                     <td><?=($sum['mutasi_pengurangan'] != 0 ) ? rupiah($sum['mutasi_pengurangan']) : '-';?></td>
                                     <td><?=($sum['saldo_akhir_smt1'] != 0 ) ? rupiah($sum['saldo_akhir_smt1']) : '-';?></td>
-                                    <td><?=($sum['rka'] != 0 ) ? rupiah($sum['rka']) : '-';?></td>
+                                    <!-- <td><?=($sum['rka'] != 0 ) ? rupiah($sum['rka']) : '-';?></td> -->
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
