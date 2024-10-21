@@ -19,6 +19,7 @@ class Perubahan_dana_bersih extends CI_Controller {
 		// if($userData['idusergroup'] !== '001') show_404();
         $this->iduser = $this->session->userdata('iduser');
 		$this->tahun = $this->session->userdata('tahun');
+        $this->id_bulan = $this->session->userdata('id_bulan');
 		$this->page_limit = 20;
 		
 	}
@@ -30,6 +31,11 @@ class Perubahan_dana_bersih extends CI_Controller {
         $data['total_bersih'] = $this->aset_investasi_model->getdata('dana_bersih_lv0','result');
 
         $data['data_perubahan_dana_bersih_ket'] = $this->perubahan_dana_bersih_model->get_ket('ket_perubahan_dana_bersih');
+         // PENAMHABAN FUNGSI PERUBAHAN DANA BERSIH SUMMARY
+        $this->perubahan_dana_bersih_model->Summary_Perubahan($this->iduser,$this->id_bulan,$this->tahun);
+
+        $data['sum'] = $this->perubahan_dana_bersih_model->getdata('tbl_perubahan_dana_bersih','result', $this->iduser,$this->id_bulan,$this->tahun);
+        $data['sumprev'] = $this->perubahan_dana_bersih_model->getdata('tbl_perubahan_dana_bersih_lalu','result', $this->iduser,$this->id_bulan,$this->tahun);
 
         $data['opt_user'] = dtuser();
         $data['bulan'] = bulan();
@@ -63,6 +69,10 @@ class Perubahan_dana_bersih extends CI_Controller {
                 $data['opt_user'] = dtuser();
                 $data['data_perubahan_danabersih'] = $this->nilai_perubahan_danabersih();
                 $data['data_perubahan_dana_bersih_ket'] = $this->perubahan_dana_bersih_model->get_ket('ket_perubahan_dana_bersih');
+
+                $data['sum'] = $this->perubahan_dana_bersih_model->getdata('tbl_perubahan_dana_bersih','result', $this->iduser,$this->id_bulan,$this->tahun);
+                $data['sumprev'] = $this->perubahan_dana_bersih_model->getdata('tbl_perubahan_dana_bersih_lalu','result', $this->iduser,$this->id_bulan,$this->tahun);
+
                 $data['tot_perubahan'] = $this->aset_investasi_model->getdata('perubahan_danabersih_lv1','result');
                 $data['total_bersih'] = $this->aset_investasi_model->getdata('dana_bersih_lv0','result');
                 $template=$this->load->view('bulanan/perubahan_dana_bersih/index_pdf_export', $data,true);  

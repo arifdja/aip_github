@@ -98,37 +98,42 @@
       <?php endforeach;?>
     <?php endif;?>
     <?php
-    $saldo_akhir1 = (!empty($tot_perubahan[0]->saldo_akhir) ? $tot_perubahan[0]->saldo_akhir : '0');
-    $saldo_akhir2 = (!empty($tot_perubahan[1]->saldo_akhir) ? $tot_perubahan[1]->saldo_akhir : '0');
-    $saldo_akhir_bln_lalu1 = (!empty($tot_perubahan[0]->saldo_akhir_bln_lalu) ? $tot_perubahan[0]->saldo_akhir_bln_lalu : '0');
-    $saldo_akhir_bln_lalu2 = (!empty($tot_perubahan[1]->saldo_akhir_bln_lalu) ? $tot_perubahan[1]->saldo_akhir_bln_lalu : '0');
+    // $saldo_akhir1 = (!empty($tot_perubahan[0]->saldo_akhir) ? $tot_perubahan[0]->saldo_akhir : '0');
+    // $saldo_akhir2 = (!empty($tot_perubahan[1]->saldo_akhir) ? $tot_perubahan[1]->saldo_akhir : '0');
+    // $saldo_akhir_bln_lalu1 = (!empty($tot_perubahan[0]->saldo_akhir_bln_lalu) ? $tot_perubahan[0]->saldo_akhir_bln_lalu : '0');
+    // $saldo_akhir_bln_lalu2 = (!empty($tot_perubahan[1]->saldo_akhir_bln_lalu) ? $tot_perubahan[1]->saldo_akhir_bln_lalu : '0');
 
-                // $dbersih_awal1 = ((!empty($total_dbersih['saldo_akhir']) ? $total_dbersih['saldo_akhir']: '0');
-                // $dbersih_awal2 = (!empty($total_dbersih['saldo_akhir_bln_lalu']) ? $total_dbersih['saldo_akhir_bln_lalu']: '0');
-    $total_bersih1 = (!empty($total_bersih[0]->saldo_akhir_bln_lalu) ? $total_bersih[0]->saldo_akhir_bln_lalu : '0');
-    $total_bersih2 = (!empty($total_bersih[1]->saldo_akhir_bln_lalu) ? $total_bersih[1]->saldo_akhir_bln_lalu : '0');
+    //             // $dbersih_awal1 = ((!empty($total_dbersih['saldo_akhir']) ? $total_dbersih['saldo_akhir']: '0');
+    //             // $dbersih_awal2 = (!empty($total_dbersih['saldo_akhir_bln_lalu']) ? $total_dbersih['saldo_akhir_bln_lalu']: '0');
+    // $total_bersih1 = (!empty($total_bersih[0]->saldo_akhir_bln_lalu) ? $total_bersih[0]->saldo_akhir_bln_lalu : '0');
+    // $total_bersih2 = (!empty($total_bersih[1]->saldo_akhir_bln_lalu) ? $total_bersih[1]->saldo_akhir_bln_lalu : '0');
 
-    $dbersih_awal2 =  $total_bersih1 -  $total_bersih2;
-    $tot = $saldo_akhir1 - $saldo_akhir2;
-    $tot_prev = $saldo_akhir_bln_lalu1 - $saldo_akhir_bln_lalu2;
-    $dbersih_akhir2 =  $tot_prev + $dbersih_awal2;
-    $dbersih_akhir1 =  $tot + $dbersih_akhir2;
+    // $dbersih_awal2 =  $total_bersih1 -  $total_bersih2;
+    // $tot = $saldo_akhir1 - $saldo_akhir2;
+    // $tot_prev = $saldo_akhir_bln_lalu1 - $saldo_akhir_bln_lalu2;
+    // $dbersih_akhir2 =  $tot_prev + $dbersih_awal2;
+    // $dbersih_akhir1 =  $tot + $dbersih_akhir2;
 
     ?>
     <tr style="font-weight: bold; background-color:#d2ebf9;">
       <td style="text-align: left;">PENINGKATAN (PENURUNAN)</td>
-      <td style="text-align: right;"><?=($tot_prev != 0 ) ? rupiah($tot_prev) : '-';?></td>
-      <td style="text-align: right;"><?=($tot != 0 ) ? rupiah($tot) : '-';?></td>
+      <td style="text-align: right;"><?=(isset($sum[0]->peningkatan_penurunan) ) ? rupiah($sum[0]->peningkatan_penurunan) : '-';?></td>
+      <td style="text-align: right;"><?=(isset($sum[0]->peningkatan_penurunan_bln_lalu) ) ? rupiah($sum[0]->peningkatan_penurunan_bln_lalu) : '-';?></td>
     </tr>
     <tr style="font-weight: bold; background-color:#d2ebf9;">
       <td style="text-align: left;">DANA BERSIH AWAL PERIODE</td>
-      <td style="text-align: right;"><?=($dbersih_awal2 != 0 ) ? rupiah($dbersih_awal2) : '-';?></td>
-      <td style="text-align: right;"><?=($dbersih_akhir2 != 0 ) ? rupiah($dbersih_akhir2) : '-';?></td>
+      <td style="text-align: right;"><?=(isset($sum[0]->danabersih_awal_periode ) ) ? rupiah($sum[0]->danabersih_awal_periode) : '-';?></td>
+      <td style="text-align: right;"><?=(isset($sum[0]->danabersih_awal_periode_lalu) ) ? rupiah($sum[0]->danabersih_awal_periode_lalu) : '-';?></td>
+    </tr>
+    <tr style="font-weight: bold; background-color:#d2ebf9;">
+      <td style="text-align: left;">KOREKSI AUDIT</td>
+      <td style="text-align: right;"><?=(isset($sum[0]->koreksi_audit) ) ? rupiah($sum[0]->koreksi_audit) : '-';?></td>
+      <td style="text-align: right;"><?=(isset($sumprev[0]->koreksi_audit) ) ? rupiah($sumprev[0]->koreksi_audit) : '-';?></td>
     </tr>
     <tr style="font-weight: bold; background-color:#d2ebf9;">
       <td style="text-align: left;">DANA BERSIH AKHIR PERIODE</td>
-      <td style="text-align: right;"><?=($dbersih_akhir2 != 0 ) ? rupiah($dbersih_akhir2) : '-';?></td>
-      <td style="text-align: right;"><?=($dbersih_akhir1 != 0 ) ? rupiah($dbersih_akhir1) : '-';?></td>
+      <td style="text-align: right;"><?=(isset($sum[0]->danabersih_akhir_periode) ) ? rupiah($sum[0]->danabersih_akhir_periode) : '-';?></td>
+      <td style="text-align: right;"><?=(isset($sum[0]->danabersih_akhir_periode_lalu) ) ? rupiah($sum[0]->danabersih_akhir_periode_lalu) : '-';?></td>
     </tr>
   </tbody>
 </table>

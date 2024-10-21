@@ -70,6 +70,334 @@ class Perubahan_dana_bersih_model extends CI_Model {
 		return $this->db->query($sql)->result();
 	}
 
+
+	public function Summary_Perubahan($iduser, $id_bulan, $tahun)
+	{
+
+		$this->db->trans_begin();
+
+		if ($id_bulan === '1' && $tahun === '2020') {
+			$nilaiTaspen = '151428469320652';
+			$nilaiAsabri = '17669911410364';
+
+
+			$sql = "
+					SELECT X.iduser, '".$id_bulan."', '".$tahun."',
+				
+				        SUM(X.saldo_akhir_bln_lalu) as B_peningkatan_penurunan_bln_lalu, 
+				        CASE WHEN X.iduser = '".$iduser."' THEN
+				            SUM(X.saldo_akhir_bln_lalu)+'".$nilaiTaspen."' 
+				            ELSE
+				            SUM(X.saldo_akhir_bln_lalu)+'".$nilaiAsabri."'
+				        END
+				        AS B_danabersih_awal_periode_lalu, 
+				        CASE WHEN X.iduser = '".$iduser."' THEN
+				            SUM(X.saldo_akhir_bln_lalu)+'".$nilaiTaspen."' + SUM(X.saldo_akhir_bln_lalu)
+				            ELSE
+				            SUM(X.saldo_akhir_bln_lalu)+'".$nilaiAsabri."' + SUM(X.saldo_akhir_bln_lalu)
+				        END
+				        AS B_danabersih_akhir_periode_lalu,
+				        
+						  SUM(X.saldo_akhir) A_peningkatan_penurunan,
+				        CASE WHEN X.iduser = '".$iduser."' THEN
+				            SUM(X.saldo_akhir_bln_lalu)+'".$nilaiTaspen."' + SUM(X.saldo_akhir_bln_lalu)
+				            ELSE
+				            SUM(X.saldo_akhir_bln_lalu)+'".$nilaiAsabri."' + SUM(X.saldo_akhir_bln_lalu)
+				        END
+				        AS A_danabersih_awal_periode,
+				        
+				        CASE WHEN X.iduser = '".$iduser."' THEN
+				            SUM(X.saldo_akhir_bln_lalu)+'".$nilaiTaspen."' + SUM(X.saldo_akhir_bln_lalu)+SUM(X.saldo_akhir)
+				            ELSE
+				            SUM(X.saldo_akhir_bln_lalu)+'".$nilaiAsabri."' + SUM(X.saldo_akhir_bln_lalu) + SUM(X.saldo_akhir)
+				        END
+				        AS A_danabersih_akhir_periode,
+				        0,
+				        1
+				        FROM (
+				        SELECT
+				            A.*, B.id_investasi,
+				            B.jenis_investasi,
+				            B.iduser,
+				            C.id_bulan,
+				            B.`group`,
+				            B.parent_id,
+				            B.type_sub_jenis_investasi AS type,
+				            CASE WHEN A.uraian = 'PENGURANGAN' THEN
+				            COALESCE (
+				                SUM(
+				                    CASE
+				                    WHEN B.`group` = 'HASIL INVESTASI' THEN
+				                        (C.mutasi * -1)
+				                    ELSE
+				                        (C.saldo_akhir *-1)
+				                    END
+				                ),
+				                0
+				            ) 
+				            ELSE
+				                COALESCE (
+				                    SUM(
+				                        CASE
+				                        WHEN B.`group` = 'HASIL INVESTASI' THEN
+				                            C.mutasi
+				                        ELSE
+				                            C.saldo_akhir
+				                        END
+				                    ),
+				                    0
+				                ) 
+				            END
+				            AS saldo_akhir,
+				            COALESCE (
+				                (SELECT saldo_akhir_invest FROM bln_aset_investasi_header WHERE C.id_bulan = id_bulan-1 AND C.iduser = '".$iduser."' AND CASE WHEN '".$tahun."' = '2020' THEN tahun = '2019' ELSE tahun = '".$tahun."' END AND id_investasi = B.id_investasi),
+				                0
+				            )
+				            AS saldo_akhir_bln_lalu
+				        FROM
+				            mst_perubahan_danabersih A
+				        LEFT JOIN mst_investasi B ON A.id_perubahan_dana_bersih = B.id_perubahan_dana_bersih
+				        LEFT JOIN (
+				            SELECT
+				                id_investasi,
+				                saldo_akhir_invest AS saldo_akhir,
+				                mutasi_invest AS mutasi,
+				                id_bulan,
+				                tahun,
+				                iduser
+				            FROM
+				                bln_aset_investasi_header
+				            WHERE id_bulan = '".$id_bulan."'
+				            AND iduser = '".$iduser."'
+				            AND tahun = '".$tahun."'
+				        ) C ON B.id_investasi = C.id_investasi
+				        WHERE
+				            B.iduser = '".$iduser."'
+				        GROUP BY
+				            A.uraian
+				        ) AS X
+					GROUP BY X.iduser, X.id_bulan;
+				";
+
+			$data = $this->db->query($sql)->row_array();
+
+			$query = $this->db->get_where('tbl_perubahan_dana_bersih',array('iduser' => $iduser,'id_bulan' => $id_bulan,'tahun' => $tahun));
+			if($query->num_rows() > 0){
+				$update = array(
+					'peningkatan_penurunan_bln_lalu' => escape($data['B_peningkatan_penurunan_bln_lalu']),
+					'danabersih_awal_periode_lalu' => escape($data['B_danabersih_awal_periode_lalu']),
+					'danabersih_akhir_periode_lalu' => escape($data['B_danabersih_akhir_periode_lalu']),
+					'peningkatan_penurunan' => escape($data['A_peningkatan_penurunan']),
+					'danabersih_awal_periode' => escape($data['A_danabersih_awal_periode']),
+					'danabersih_akhir_periode' => escape($data['A_danabersih_akhir_periode']),
+				);
+				$this->db->update('tbl_perubahan_dana_bersih', $update, array('iduser' => $iduser,'id_bulan' => $id_bulan,'tahun' => $tahun) );
+			}else{
+
+				
+
+				$insert = array(
+					'iduser' => $this->iduser,
+					'id_bulan' => $id_bulan,
+					'tahun' => $this->tahun,
+					'peningkatan_penurunan_bln_lalu' => escape($data['B_peningkatan_penurunan_bln_lalu']),
+					'danabersih_awal_periode_lalu' => escape($data['B_danabersih_awal_periode_lalu']),
+					'danabersih_akhir_periode_lalu' => escape($data['B_danabersih_akhir_periode_lalu']),
+					'peningkatan_penurunan' => escape($data['A_peningkatan_penurunan']),
+					'danabersih_awal_periode' => escape($data['A_danabersih_awal_periode']),
+					'danabersih_akhir_periode' => escape($data['A_danabersih_akhir_periode']),
+					'is_saldo_awal' => 0,
+					'id_summary' => 1,
+				);
+
+				$this->db->insert('tbl_perubahan_dana_bersih', $insert);
+
+			}
+
+
+		}else{
+
+			if($id_bulan == 1 ){
+				$bln_lalu = 12;
+				$tahun_lalu = $tahun - 1;
+			}else{
+				$bln_lalu = $id_bulan -1;
+				$tahun_lalu = $tahun;
+			}
+
+			$sql2 = "
+		    	SELECT SUM(X.saldo_akhir) A_peningkatan_penurunan
+				        FROM (
+				        SELECT
+				            A.*, B.id_investasi,
+				            B.jenis_investasi,
+				            B.iduser,
+				            C.id_bulan,
+				            C.tahun,
+				            B.`group`,
+				            B.parent_id,
+				            B.type_sub_jenis_investasi AS type,
+				            CASE WHEN A.uraian = 'PENGURANGAN' THEN
+				            COALESCE (
+				                SUM(
+				                    CASE
+				                    WHEN B.`group` = 'HASIL INVESTASI' THEN
+				                        (C.mutasi * -1)
+				                    ELSE
+				                        (C.saldo_akhir *-1)
+				                    END
+				                ),
+				                0
+				            ) 
+				            ELSE
+				                COALESCE (
+				                    SUM(
+				                        CASE
+				                        WHEN B.`group` = 'HASIL INVESTASI' THEN
+				                            C.mutasi
+				                        ELSE
+				                            C.saldo_akhir
+				                        END
+				                    ),
+				                    0
+				                ) 
+				            END
+				            AS saldo_akhir,
+				            CASE WHEN A.uraian = 'PENGURANGAN' THEN
+				            	COALESCE (
+				                SUM(
+				                    CASE
+				                    WHEN B.`group` = 'HASIL INVESTASI' THEN
+				                        (D.mutasi * -1)
+				                    ELSE
+				                        (D.saldo_akhir *-1)
+				                    END
+				                ),
+				                0
+				            ) 
+				            ELSE
+				                COALESCE (
+				                    SUM(
+				                        CASE
+				                        WHEN B.`group` = 'HASIL INVESTASI' THEN
+				                            D.mutasi
+				                        ELSE
+				                            D.saldo_akhir
+				                        END
+				                    ),
+				                    0
+				                ) 
+				            END
+				            AS saldo_akhir_bln_lalu
+				        FROM
+				            mst_perubahan_danabersih A
+				        LEFT JOIN mst_investasi B ON A.id_perubahan_dana_bersih = B.id_perubahan_dana_bersih
+				        LEFT JOIN (
+				            SELECT
+				                id_investasi,
+				                saldo_akhir_invest AS saldo_akhir,
+				                mutasi_invest AS mutasi,
+				                id_bulan,
+				                tahun,
+				                iduser
+				            FROM
+				                bln_aset_investasi_header
+				            WHERE id_bulan = '".$id_bulan."'
+				            AND iduser = '".$iduser."'
+				            AND tahun = '".$tahun."'
+				        ) C ON B.id_investasi = C.id_investasi
+				        LEFT JOIN (
+				            SELECT
+				                id_investasi,
+				                saldo_akhir_invest AS saldo_akhir,
+				                mutasi_invest AS mutasi,
+				                id_bulan,
+				                tahun,
+				                iduser
+				            FROM
+				                bln_aset_investasi_header
+				            WHERE id_bulan = '".$bln_lalu."'
+				            AND iduser = '".$iduser."'
+				            AND tahun = '".$tahun_lalu."'
+				        ) D ON B.id_investasi = D.id_investasi
+				        WHERE B.iduser = '".$iduser."'
+				        GROUP BY A.uraian ) AS X
+				GROUP BY X.iduser, X.id_bulan, X.tahun
+				
+		      	
+			";
+
+			// echo $sql2;exit;
+			$data2 = $this->db->query($sql2)->row_array();
+
+
+
+			$sql3 = "
+				SELECT '".$iduser."',
+						'".$bln_lalu."', 
+						'".$tahun_lalu."',
+						`peningkatan_penurunan` AS peningkatan_penurunan_bln_lalu, 
+						`danabersih_awal_periode` AS danabersih_awal_periode_lalu, 
+						`danabersih_akhir_periode` AS danabersih_akhir_periode_lalu, 
+						'".$data2['A_peningkatan_penurunan']."' AS peningkatan_penurunan, 
+						`danabersih_akhir_periode` AS danabersih_awal_periode, 
+						'".$data2['A_peningkatan_penurunan']."'+`danabersih_akhir_periode` AS danabersih_akhir_periode, 
+						koreksi_audit,
+						`is_saldo_awal`,`id_summary` 
+				FROM `tbl_perubahan_dana_bersih` 
+				WHERE `iduser` = '".$iduser."' AND `id_bulan` = '".$bln_lalu."' AND `tahun` = '".$tahun_lalu."'
+			";
+
+			$data3 = $this->db->query($sql3)->row_array();
+			// var_dump($sql2);exit;
+			if(isset($data3)){
+				$query2 = $this->db->get_where('tbl_perubahan_dana_bersih',array('iduser' => $iduser,'id_bulan' => $id_bulan,'tahun' => $tahun));
+				if($query2->num_rows() > 0){
+					$koreksi = $query2->row_array();
+					$update2 = array(
+						'peningkatan_penurunan_bln_lalu' => escape($data3['peningkatan_penurunan_bln_lalu']),
+						'danabersih_awal_periode_lalu' => escape($data3['danabersih_awal_periode_lalu']),
+						'danabersih_akhir_periode_lalu' => escape($data3['danabersih_akhir_periode_lalu']),
+						'peningkatan_penurunan' => escape($data3['peningkatan_penurunan']),
+						'danabersih_awal_periode' => escape($data3['danabersih_awal_periode']),
+						'danabersih_akhir_periode' => escape($data3['danabersih_akhir_periode'] + $koreksi['koreksi_audit']),
+					);
+					$this->db->update('tbl_perubahan_dana_bersih', $update2, array('iduser' => $iduser,'id_bulan' => $id_bulan,'tahun' => $tahun) );
+				}else{
+
+					$insert2 = array(
+						'iduser' => $this->iduser,
+						'id_bulan' => $id_bulan,
+						'tahun' => $this->tahun,
+						'peningkatan_penurunan_bln_lalu' => escape($data3['peningkatan_penurunan_bln_lalu']),
+						'danabersih_awal_periode_lalu' => escape($data3['danabersih_awal_periode_lalu']),
+						'danabersih_akhir_periode_lalu' => escape($data3['danabersih_akhir_periode_lalu']),
+						'peningkatan_penurunan' => escape($data3['peningkatan_penurunan']),
+						'danabersih_awal_periode' => escape($data3['danabersih_awal_periode']),
+						'danabersih_akhir_periode' => escape($data3['danabersih_akhir_periode']),
+						'is_saldo_awal' => 0,
+						'id_summary' => 1,
+					);
+
+					$this->db->insert('tbl_perubahan_dana_bersih', $insert2);
+
+				}
+			}
+
+		}
+		
+
+		
+
+		if($this->db->trans_status() == false){
+			$this->db->trans_rollback();
+			return 'gagal';
+		}else{
+			return $this->db->trans_commit();
+		}
+
+	}
+
 	function getdata($type="", $balikan="", $p1="", $p2="",$p3="",$p4=""){
 		$array = array();
 		$where  = " WHERE 1=1 ";
@@ -115,6 +443,33 @@ class Perubahan_dana_bersih_model extends CI_Model {
 		}
 
 		switch($type){
+			case 'tbl_perubahan_dana_bersih':
+				$sql = "
+					SELECT * 
+					FROM `tbl_perubahan_dana_bersih` 
+					WHERE `iduser` = '".$p1."'
+					AND `id_bulan` = '".$p2."' 
+					AND `tahun` = '".$p3."'
+				";
+			break;
+
+			case 'tbl_perubahan_dana_bersih_lalu':
+				if($p2 == 1){
+					$bln_lalu = 12;
+					$tahun_lalu = $p3 - 1;
+				}else{
+					$bln_lalu = $p2 -1;
+					$tahun_lalu = $p3;
+				}
+				$sql = "
+					SELECT * 
+					FROM `tbl_perubahan_dana_bersih` 
+					WHERE `iduser` = '".$p1."'
+					AND `id_bulan` = '".$bln_lalu."' 
+					AND `tahun` = '".$tahun_lalu."'
+				";
+			break;
+
 			case 'aset_investasi_front':
 				// kondisi setelah bulan januari
 				// kondisi bulan lalu
